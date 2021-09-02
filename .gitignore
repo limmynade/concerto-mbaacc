@@ -27,6 +27,7 @@ MBAA.exe
 relay_list.txt
 lobby_list.txt
 Translation Changelog.html
+assets/
 
 # Concerto EXEs
 Concerto.exe
@@ -165,3 +166,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#GIMP
+*.xcf
