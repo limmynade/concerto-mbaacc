@@ -179,13 +179,15 @@
                     on_release: 
                         app.sm.current = 'Main'
                     size_hint_y: 1
-            BoxLayout:
-                size_hint_y: 0.9
-                padding: 20,5
+            ScrollView:
+                size_hint: (1, 0.8)
+                do_scroll_x: False
+                do_scroll_y: True
                 Label:
                     id: about
-                    size_hint: (1,1)
-                    text_size: self.size
+                    size_hint: None, None
+                    #text_size: self.size
+                    size: self.texture_size
                     halign: 'left'
                     valign: 'top'
                     markup: True
