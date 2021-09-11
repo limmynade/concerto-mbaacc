@@ -13,9 +13,10 @@
 [b]Audio credits:[/b]
 - Main BGM (menu_bgm) by [u][ref=https://twitter.com/TempxaRK9]Tempxa[/ref][/u]
 - Resources BGM (resource_bgm) by [u][ref=https://twitter.com/soffdrinks]softdrinks[/ref][/u]
+
 [b]melty blood türk kawga Edition:[/b]
--Coding by [u][ref=https://github.com/Brogolem35]brogolem35[/ref][/u]
--Official arts are edited by some people that (for some reason) doesn't
+-Programing by [u][ref=https://github.com/Brogolem35]brogolem35[/ref][/u]
+-Official artwork are edited by some people that (for some reason) don't
 want to get any credit.
 -Made for [u][ref=https://discord.gg/vj62m6PMbh]melty blood türk kawga Discord server[/ref][/u].
 
