@@ -169,3 +169,6 @@ dmypy.json
 
 #GIMP
 *.xcf
+
+#VS Code
+*.code-workspace
