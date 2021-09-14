@@ -14,6 +14,12 @@ For best usage don't open CCCaster or MBAA.exe on their own while using this pro
 
 HIGHLY EXPERIMENTAL SOFTWARE, ENJOY AND EXPECT BUGS
 
+## melty blood türk kawga Edition
+* Programing by [brogolem35](https://github.com/Brogolem35)
+* Official artwork are edited by some people that (for some reason) don't want to get any credit.
+* Made for the [melty blood türk kawga Discord server.](https://discord.gg/vj62m6PMbh)
+* Sigma music: [Nightshift TV - D r i v e F o r e v e r](https://www.youtube.com/watch?v=KlW-uHtmnBg)
+
 ## Building
 This project requires Python version 3.8
 
