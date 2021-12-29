@@ -108,7 +108,7 @@ if os.path.exists(PATH + 'concerto.ini'):
                 if i == 'caster_exe':
                     f.write('\ncaster_exe=cccaster.v3.1.exe\n')
                 elif i == 'bgm_track':
-                    f.write('\nbgm_track=walkway\n')
+                    f.write('\nbgm_track=D r i v e F o r e v e r\n')
                 else:
                     f.write('\n%s=0\n' % i)
             f.close()
@@ -119,7 +119,7 @@ else:
             if i == 'caster_exe':
                 f.write('\ncaster_exe=cccaster.v3.1.exe\n')
             elif i == 'bgm_track':
-                f.write('\nbgm_track=walkway\n')
+                f.write('\nbgm_track=D r i v e F o r e v e r\n')
             else:
                 f.write('\n%s=0\n' % i)
         f.close()

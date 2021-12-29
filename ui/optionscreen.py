@@ -33,8 +33,8 @@ class OptionScreen(Screen):
             self.ids['bgm_vol'].value = max(0, 20 - game_config[indexes.BGM_VOL])
             self.ids['sfx_vol'].value = max(0, 20 - game_config[indexes.SFX_VOL])
             self.ids['aspect_ratio'].text = self.ids['aspect_ratio'].values[game_config[indexes.ASPECT_RATIO]]
-            if app_config['settings']['bgm_track'] == "walkway":
-                self.ids['bgm_track'].text = "Soubrette's Walkway"
+            if app_config['settings']['bgm_track'] == "D r i v e F o r e v e r":
+                self.ids['bgm_track'].text = "D r i v e F o r e v e r"
             elif app_config['settings']['bgm_track'] == "fuzzy":
                 self.ids['bgm_track'].text = "Fuzzy"
             self.ids['character_filter'].text = self.ids['character_filter'].values[game_config[indexes.CHARACTER_FILTER]]
@@ -148,9 +148,9 @@ class OptionScreen(Screen):
                             if self.app.sound.bgm.state == 'stop':
                                     self.app.sound.cut_bgm() 
                     elif "bgm_track" in i:
-                        if self.ids['bgm_track'].text == "Soubrette's Walkway":
-                            config_file[n] = "bgm_track=walkway\n"
-                            choice = "walkway"
+                        if self.ids['bgm_track'].text == "D r i v e F o r e v e r":
+                            config_file[n] = "bgm_track=D r i v e F o r e v e r\n"
+                            choice = "D r i v e F o r e v e r"
                         elif self.ids['bgm_track'].text == "Fuzzy":
                             config_file[n] = "bgm_track=fuzzy\n"
                             choice = "fuzzy"
