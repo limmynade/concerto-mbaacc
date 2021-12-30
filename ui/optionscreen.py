@@ -33,10 +33,10 @@ class OptionScreen(Screen):
             self.ids['bgm_vol'].value = max(0, 20 - game_config[indexes.BGM_VOL])
             self.ids['sfx_vol'].value = max(0, 20 - game_config[indexes.SFX_VOL])
             self.ids['aspect_ratio'].text = self.ids['aspect_ratio'].values[game_config[indexes.ASPECT_RATIO]]
-            if app_config['settings']['bgm_track'] == "D r i v e F o r e v e r":
+            if (app_config['settings']['bgm_track'] == "D r i v e F o r e v e r") or (app_config['settings']['bgm_track'] == "walkway") or (app_config['settings']['bgm_track'] == "fuzzy"):
                 self.ids['bgm_track'].text = "Sigma"
-            elif app_config['settings']['bgm_track'] == "fuzzy":
-                self.ids['bgm_track'].text = "Fuzzy"
+            elif app_config['settings']['bgm_track'] == "semsettin":
+                self.ids['bgm_track'].text = "Şemsettin"
             self.ids['character_filter'].text = self.ids['character_filter'].values[game_config[indexes.CHARACTER_FILTER]]
             self.ids['screen_filter'].active = game_config[indexes.SCREEN_FILTER] == 1
             self.ids['view_fps'].active = game_config[indexes.VIEW_FPS] == 1
@@ -151,9 +151,9 @@ class OptionScreen(Screen):
                         if self.ids['bgm_track'].text == "Sigma":
                             config_file[n] = "bgm_track=D r i v e F o r e v e r\n"
                             choice = "D r i v e F o r e v e r"
-                        elif self.ids['bgm_track'].text == "Fuzzy":
-                            config_file[n] = "bgm_track=fuzzy\n"
-                            choice = "fuzzy"
+                        elif self.ids['bgm_track'].text == "Şemsettin":
+                            config_file[n] = "bgm_track=semsettin\n"
+                            choice = "semsettin"
                         if app_config["settings"]["bgm_track"] != choice:
                             change_sound = True
                     elif "discord" in i:
