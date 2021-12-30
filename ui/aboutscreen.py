@@ -1,18 +1,14 @@
 from kivy.uix.screenmanager import Screen
-from kivy.resources import resource_find
 import webbrowser
 import config
-import io
 
 class AboutScreen(Screen):
 
     def __init__(self,**kwargs):
         super(AboutScreen, self).__init__(**kwargs)
-        
-        with io.open(resource_find('res/about.txt'), mode="r", encoding="utf-8") as f:
+        with open('../res/about.txt', mode="r", encoding="utf-8") as f:
             aboutText = f.read()
             self.ids['about'].text = aboutText
-        
         self.ids['about'].bind(on_ref_press=self.get_link)
         self.ids['version'].text = "Version %s" % config.CURRENT_VERSION
 
