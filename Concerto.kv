@@ -2,6 +2,7 @@
 #:import threading threading
 #:import res kivy.resources
 #:import pyperclip pyperclip
+#:import cfg config
 
 <MenuBtn>
     text_size: self.size
@@ -100,7 +101,7 @@
         anchor_x: 'right'
         anchor_y: 'bottom'
         Image:
-            source: 'res/stage.png'
+            source: cfg.find_img('main_bg.png')
         Image:
             source: 'res/gradient.png'
         Image:
@@ -170,7 +171,7 @@
         anchor_x: 'right'
         anchor_y: 'bottom'
         Image:
-            source: 'res/bg.png'
+            source: cfg.find_img('lobby_bg.png')
         BoxLayout:
             orientation: 'vertical'
             BoxLayout:
@@ -216,7 +217,7 @@
         anchor_x: 'left'
         anchor_y: 'top'
         Image:
-            source: 'res/bg.png'
+            source: cfg.find_img('lobby_bg.png')
         BoxLayout:
             orientation: 'vertical'
             GridLayout:
@@ -286,7 +287,7 @@
         anchor_x: 'left'
         anchor_y: 'top'
         Image:
-            source: 'res/bg.png'
+            source: cfg.find_img('lobby_bg.png')
         Image:
             source: 'res/lowergradient.png'
         BoxLayout:
@@ -392,7 +393,7 @@
         anchor_x: 'right'
         anchor_y: 'bottom'
         Image:
-            source: 'res/bg3.png'
+            source: cfg.find_img('online_bg.png')
         Image:
             source: 'res/gradient.png'
         Image:
@@ -445,7 +446,7 @@
         anchor_x: 'right'
         anchor_y: 'bottom'
         Image:
-            source: 'res/bg4.png'
+            source: cfg.find_img('resources_bg.png')
         Image:
             source: 'res/gradient.png'
         Image:
@@ -493,7 +494,7 @@
         anchor_x: 'left'
         anchor_y: 'top'
         Image:
-            source: 'res/bg.png'
+            source: cfg.find_img('lobby_bg.png')
         BoxLayout:
             orientation: 'vertical'
             MenuBtn:
@@ -564,7 +565,7 @@
         anchor_x: 'right'
         anchor_y: 'bottom'
         Image:
-            source: 'res/bg2.png'
+            source: cfg.find_img('offline_bg.png')
         Image:
             source: 'res/gradient.png'
         Image:
@@ -629,7 +630,7 @@
         anchor_x: 'right'
         anchor_y: 'bottom'
         Image:
-            source: 'res/bg.png'
+            source: cfg.find_img('lobby_bg.png')
         BoxLayout:
             orientation: 'vertical'
             BoxLayout:
