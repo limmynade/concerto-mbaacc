@@ -96,6 +96,8 @@ error_strings = [
 
 ansi_escape = re.compile(r'(\x9B|\x1B\[)[0-?    ]*[ -\/]*[@-~]')
 caster_button = re.compile(r'\[[0-9]\]')
+
+spec_names = re.compile(r'^Spectating versus mode \(\d* delay, \d* rollback\) (.*) \(.*\) vs (.*) \(.*\) \(Tap the spacebar to toggle fast-forward\)$')
 player_name_host_mm = re.compile(r'')
 player_name_join_mm = re.compile(r'\w* connected')
 
@@ -111,6 +113,33 @@ class loghelper():
             log.write(s)
 
 logger = loghelper()
+
+# Write player name to a file.  Called when spectate mode begins.
+def write_name_to_file(player_num: int, name: str):
+    with open(f'p{player_num}name.txt', mode='w') as file:
+        file.write(name)
+        file.close()
+
+
+# Write a score of 0.  Called when spectate mode begins.
+def reset_score_file(player_num: int):
+    with open(f'p{player_num}score.txt', mode='w') as file:
+        file.write('0')
+        file.close()
+
+
+# Read the value in the file and increment it.  It can be manually reset by the user this way.
+def increment_score_file(player_num: int):
+    with open(f'p{player_num}score.txt', mode='r+') as file:
+        try:
+            score = int(file.readline())
+        except ValueError:
+            score = 0
+        score = score+1
+        file.seek(0)
+        file.truncate()
+        file.write(str(score))
+        file.close()
 
 class Caster():
 
@@ -155,12 +184,16 @@ class Caster():
 
     def matchmaking(self,sc):
         self.kill_caster()
-        self.app.offline_mode = None
+        if app_config['settings']['write_scores'] == '1':
+            write_name_to_file(1, 'NETPLAY P1')
+            write_name_to_file(2, 'NETPLAY P2')
+            reset_score_file(1)
+            reset_score_file(2)
         dialog = sc.active_pop.modal_txt.text
         try:
             self.aproc = PtyProcess.spawn(app_config['settings']['caster_exe'].strip())
         except FileNotFoundError:
-            sc.error_message(['%s not found.' % app_config['settings']['caster_exe'].strip()])
+            sc.error_message('%s not found.' % app_config['settings']['caster_exe'].strip())
             return None
         while self.aproc.isalive():
             con = self.aproc.read()
@@ -177,7 +210,6 @@ class Caster():
         cur_con = ""
         last_con = ""
         con = ""
-        
         #Matchmaking cannot be launched headless, so we need to clean extra outputs (thankfully these seem to be predictable)
         junk = ["*", "0;", "19G", "\x1b[", "0;30;8m", "38m", "CCCaster 3.1", "[1] Lobby","[2] Matchmaking","[0] Cancel","[1] Netplay", "[2] Spectate", "[3] Broadcast", "[4] Offline", "[5] Server", "[6] Controls", "[7] Settings", "[8] Update", "[9] Results", "[0] Quit"]
 
@@ -224,6 +256,7 @@ class Caster():
                         rd = 0
                     #Name
                     sc.set_frames(opponent_name,delay,ping,mode=m,rounds=rd) #trigger frame delay settings in UI
+                    self.app.offline_mode = None
                     break
                 else:
                     if self.check_msg(con) != []:
@@ -245,13 +278,18 @@ class Caster():
     def host(self, sc, port='0', mode="Versus",t=None): #sc is a Screen for UI triggers
         self.kill_caster()
         self.app.offline_mode = None
+        if app_config['settings']['write_scores'] == '1':
+            write_name_to_file(1, 'NETPLAY P1')
+            write_name_to_file(2, 'NETPLAY P2')
+            reset_score_file(1)
+            reset_score_file(2)
         try:
             if mode == "Training":
                 self.aproc = PtyProcess.spawn('%s -n -t %s' % (app_config['settings']['caster_exe'].strip(),port))
             else:
                 self.aproc = PtyProcess.spawn('%s -n %s' % (app_config['settings']['caster_exe'].strip(),port)) 
         except FileNotFoundError:
-            sc.error_message(['%s not found.' % app_config['settings']['caster_exe'].strip()])
+            sc.error_message('%s not found.' % app_config['settings']['caster_exe'].strip())
             return None
         # Stats
         threading.Thread(target=self.update_stats,daemon=True).start()
@@ -329,10 +367,15 @@ class Caster():
     def join(self, ip, sc, t=None, *args): #t is required by the Lobby screen to send an "accept" request later
         self.kill_caster()
         self.app.offline_mode = None
+        if app_config['settings']['write_scores'] == '1':
+            write_name_to_file(1, 'NETPLAY P1')
+            write_name_to_file(2, 'NETPLAY P2')
+            reset_score_file(1)
+            reset_score_file(2)
         try:
             self.aproc = PtyProcess.spawn('%s -n %s' % (app_config['settings']['caster_exe'].strip(),ip)) 
         except FileNotFoundError:
-            sc.error_message(['%s not found.' % app_config['settings']['caster_exe'].strip()])
+            sc.error_message('%s not found.' % app_config['settings']['caster_exe'].strip())
             return None
         # Stats
         threading.Thread(target=self.update_stats,daemon=True).start()
@@ -389,7 +432,7 @@ class Caster():
                         sc.error_message(self.check_msg(con))
                         break
                     elif 'Spectating versus mode' in con:
-                        sc.error_message(['Host is already in a game!'])
+                        sc.error_message('Host is already in a game!')
                         break
                     elif last_con != cur_con:
                         last_con = cur_con
@@ -415,7 +458,7 @@ class Caster():
         try:
             self.aproc = PtyProcess.spawn('%s -n -s %s' % (app_config['settings']['caster_exe'].strip(),ip))
         except FileNotFoundError:
-            sc.error_message(['%s not found.' % app_config['settings']['caster_exe'].strip()])
+            sc.error_message('%s not found.' % app_config['settings']['caster_exe'].strip())
             return None
         cur_con = ""
         last_con = ""
@@ -445,6 +488,12 @@ class Caster():
                             break
                     elif x != '*' and x.replace('*', '') != '':
                         r.insert(0, x)
+                if app_config['settings']['write_scores'] == '1':
+                    regex_result = re.match(pattern=spec_names, string=' '.join(r))
+                    write_name_to_file(1, regex_result.group(1))
+                    write_name_to_file(2, regex_result.group(2))
+                    reset_score_file(1)
+                    reset_score_file(2)
                 sc.active_pop.modal_txt.text = ' '.join(r)
                 # replace connecting text with match name in caster
                 break
@@ -458,13 +507,18 @@ class Caster():
 
     def broadcast(self, sc, port='0', mode="Versus"): #sc is a Screen for UI triggers
         self.kill_caster()
+        if app_config['settings']['write_scores'] == '1':
+            write_name_to_file(1, 'LOCAL P1')
+            write_name_to_file(2, 'LOCAL P2')
+            reset_score_file(1)
+            reset_score_file(2)
         try:
             if mode == "Training":
                 self.aproc = PtyProcess.spawn('%s -n -b -t %s' % (app_config['settings']['caster_exe'].strip(),port)) 
             else:
                 self.aproc = PtyProcess.spawn('%s -n -b %s' % (app_config['settings']['caster_exe'].strip(),port))
         except FileNotFoundError:
-            sc.error_message(['%s not found.' % app_config['settings']['caster_exe'].strip()])
+            sc.error_message('%s not found.' % app_config['settings']['caster_exe'].strip())
             return None
         logger.write('\n== Broadcast %s ==\n' % mode)
         self.broadcasting = True
@@ -487,7 +541,7 @@ class Caster():
         try:
             proc = PtyProcess.spawn(app_config['settings']['caster_exe'].strip())
         except FileNotFoundError:
-            sc.error_message(['%s not found.' % app_config['settings']['caster_exe'].strip()])
+            sc.error_message('%s not found.' % app_config['settings']['caster_exe'].strip())
             return None
         self.aproc = proc
         logger.write('\n== Training ==\n')
@@ -506,10 +560,15 @@ class Caster():
     def local(self,sc):
         self.kill_caster()
         self.startup = True
+        if app_config['settings']['write_scores'] == '1':
+            write_name_to_file(1, 'LOCAL P1')
+            write_name_to_file(2, 'LOCAL P2')
+            reset_score_file(1)
+            reset_score_file(2)
         try:
             proc = PtyProcess.spawn(app_config['settings']['caster_exe'].strip())
         except FileNotFoundError:
-            sc.error_message(['%s not found.' % app_config['settings']['caster_exe'].strip()])
+            sc.error_message('%s not found.' % app_config['settings']['caster_exe'].strip())
             return None
         self.aproc = proc
         while self.aproc.isalive():
@@ -529,7 +588,7 @@ class Caster():
         try:
             proc = PtyProcess.spawn(app_config['settings']['caster_exe'].strip())
         except FileNotFoundError:
-            sc.error_message(['%s not found.' % app_config['settings']['caster_exe'].strip()])
+            sc.error_message('%s not found.' % app_config['settings']['caster_exe'].strip())
             return None
         self.aproc = proc
         while self.aproc.isalive():
@@ -549,7 +608,7 @@ class Caster():
         try:
             proc = PtyProcess.spawn(app_config['settings']['caster_exe'].strip())
         except FileNotFoundError:
-            sc.error_message(['%s not found.' % app_config['settings']['caster_exe'].strip()])
+            sc.error_message('%s not found.' % app_config['settings']['caster_exe'].strip())
             return None
         self.aproc = proc
         while self.aproc.isalive():
@@ -566,10 +625,15 @@ class Caster():
     def tournament(self,sc):
         self.kill_caster()
         self.startup = True
+        if app_config['settings']['write_scores'] == '1':
+            write_name_to_file(1, 'LOCAL P1')
+            write_name_to_file(2, 'LOCAL P2')
+            reset_score_file(1)
+            reset_score_file(2)
         try:
             proc = PtyProcess.spawn(app_config['settings']['caster_exe'].strip())
         except FileNotFoundError:
-            sc.error_message(['%s not found.' % app_config['settings']['caster_exe'].strip()])
+            sc.error_message('%s not found.' % app_config['settings']['caster_exe'].strip())
             return None
         self.aproc = proc
         while self.aproc.isalive():
@@ -586,10 +650,15 @@ class Caster():
     def replays(self,sc):
         self.kill_caster()
         self.startup = True
+        if app_config['settings']['write_scores'] == '1':
+            write_name_to_file(1, 'REPLAY P1')
+            write_name_to_file(2, 'REPLAY P2')
+            reset_score_file(1)
+            reset_score_file(2)
         try:
             proc = PtyProcess.spawn(app_config['settings']['caster_exe'].strip())
         except FileNotFoundError:
-            sc.error_message(['%s not found.' % app_config['settings']['caster_exe'].strip()])
+            sc.error_message('%s not found.' % app_config['settings']['caster_exe'].strip())
             return None
         self.aproc = proc
         while self.aproc.isalive():
@@ -609,7 +678,7 @@ class Caster():
             self.aproc = PtyProcess.spawn('MBAA.exe')
             self.flag_offline(sc,stats=False)
         except FileNotFoundError:
-            sc.error_message(['MBAA.exe not found.'])
+            sc.error_message('MBAA.exe not found.')
             return None
 
     def find_button(self,read,term):
@@ -649,7 +718,7 @@ class Caster():
                     break
             else:
                 break
-        sc.active_pop.dismiss()
+        sc.dismiss_active_pop()
 
     def find_pid(self):
         if self.pid == None:
@@ -672,6 +741,8 @@ class Caster():
     def update_stats(self,once=False):
         # Used to update presence only on state change 
         state = None
+        p1wins = 0
+        p2wins = 0
         while True:
             if self.aproc is None:
                 break
@@ -709,7 +780,7 @@ class Caster():
                                     else:
                                         presence.offline_game(self.app.offline_mode, p1_char, self.stats["p1char"], p2_char, self.stats["p2char"],lobby_id=self.app.LobbyScreen.code)
                                 else:
-                                    presence.public_lobby_game(self.app.LobbyScreen.code, self.app.LobbyScreen.opponent, char1_name=p1_char, char1_id=self.stats["p1char"], char2_name=p2_char, char2_id=self.stats["p2char"])
+                                    presence.public_lobby_game(self.app.LobbyScreen.code, self.app.LobbyScreen.opponent, char1_name=p1_char, char1_id=self.stats["p1char"], char2_name=p2_char, char2_id=self.stats["p2char"])     
                             else:
                                 if self.app.offline_mode != None:
                                     if self.app.offline_mode.lower() == 'training' or self.app.offline_mode.lower() == 'replay theater':
@@ -729,6 +800,18 @@ class Caster():
                         else:
                             presence.character_select(self.app.mode)
                         state = self.stats["state"]
+                if app_config['settings']['write_scores'] == '1':
+                    mode = self.app.offline_mode
+                    if self.app.mode.lower() == 'direct match' or mode.lower() == 'spectating' or mode.lower() == 'tournament vs' or mode.lower() == 'local vs' or mode.lower() == 'replay theater':
+                        try:
+                            if self.stats["p1wins"] > p1wins and self.stats["p1wins"] == self.stats["towin"]:
+                                increment_score_file(1)
+                            if self.stats["p2wins"] > p2wins and self.stats["p2wins"] == self.stats["towin"]:
+                                increment_score_file(2)
+                            p1wins = self.stats["p1wins"]
+                            p2wins = self.stats["p2wins"]
+                        except TypeError:
+                            pass
             if once:
                 break
             else:
@@ -749,8 +832,10 @@ class Caster():
         self.adr = None
         self.rs = -1
         self.ds = -1
+        killed = False
         if self.aproc != None:
             subprocess.run('taskkill /f /im %s' % app_config['settings']['caster_exe'].strip(), shell=True, creationflags=subprocess.CREATE_NO_WINDOW)
+            killed = True
         self.aproc = None
         self.startup = False
         self.offline = False
@@ -766,8 +851,9 @@ class Caster():
                     self.app.mode = 'Private Lobby'
                     presence.private_lobby()
             else:
-                self.app.mode = 'Menu'
-                presence.menu()
+                if killed:
+                    self.app.mode = 'Menu'
+                    presence.menu()
 
     def check_msg(self,s):
         e = []
