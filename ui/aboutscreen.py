@@ -6,7 +6,7 @@ class AboutScreen(ConcertoScreen):
 
     def __init__(self,CApp):
         super().__init__(CApp)
-        with open(resource_find('res/about.txt')) as f:
+        with open(resource_find('res/about.txt'), mode="r", encoding="utf-8") as f:
             c = f.read()
             self.ids['about'].text = c
         self.ids['about'].bind(on_ref_press=self.open_link)
